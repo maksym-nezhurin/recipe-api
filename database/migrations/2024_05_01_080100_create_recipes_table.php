@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('creator_id')->constrained('users');
             $table->string('name');
             $table->text('description');
-            $table->string('image');
-            $table->integer('prep_time');
+            $table->string('image')->default('/test.jpg');
+            $table->integer('prep_time')->default(1000);
 //            $table->('ingredients'); we need reference to another table
         });
     }

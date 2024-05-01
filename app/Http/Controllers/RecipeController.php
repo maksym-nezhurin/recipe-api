@@ -14,14 +14,8 @@ class RecipeController extends Controller
 {
     public function index(Request $request)
     {
-        $recipes = QueryBuilder::for(Recipe::class)
-            ->allowedFilters(['name', 'description', 'image', 'prep_time'])
-            ->defaultSort('name')
-            ->allowedSorts(['name', 'description', 'image', 'prep_time'])
-            ->paginate();
-
-        return new RecipeCollection($recipes);
-//        return new RecipeCollection(Recipe::paginate());
+        return RecipeResource::collection(Recipe::paginate(10));
+//        return RecipeResource::collection(Recipe::where(['creator_id'=>auth()->user()->id])->paginate(10));
     }
 
     public function show(Request $request, Recipe $recipe)
@@ -32,7 +26,10 @@ class RecipeController extends Controller
     public function store(StoreRecipeRequest $request)
     {
         $validated = $request->validated();
-        $recipe = Recipe::create($validated);
+
+        Log::info(Auth::user());
+        $recipe = Auth::user()->recipes()->create($validated);
+//       $recipe = Recipe::create($validated);
         return new RecipeResource($recipe);
     }
 

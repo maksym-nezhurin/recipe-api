@@ -15,7 +15,6 @@ class RecipeResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data = parent::toArray($request);
-//        $data['status'] = $this->is_done ? 'finished' : 'opened';
 
         return $data;
     }
