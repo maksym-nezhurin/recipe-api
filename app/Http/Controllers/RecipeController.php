@@ -4,26 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Requests\UpdateRecipeRequest;
-use Spatie\QueryBuilder\QueryBuilder;
-use App\Http\Resources\RecipeCollection;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * @return AnonymousResourceCollection
+     */
+    public function index() : AnonymousResourceCollection
     {
         return RecipeResource::collection(Recipe::paginate(10));
 //        return RecipeResource::collection(Recipe::where(['creator_id'=>auth()->user()->id])->paginate(10));
     }
 
-    public function show(Request $request, Recipe $recipe)
+    /**
+     * @param Recipe $recipe
+     * @return RecipeResource
+     */
+    public function show(Recipe $recipe): RecipeResource
     {
         return new RecipeResource($recipe);
     }
 
-    public function store(StoreRecipeRequest $request)
+    /**
+     * @param StoreRecipeRequest $request
+     * @return RecipeResource
+     */
+    public function store(StoreRecipeRequest $request): RecipeResource
     {
         $validated = $request->validated();
 
@@ -33,16 +46,25 @@ class RecipeController extends Controller
         return new RecipeResource($recipe);
     }
 
-    public function update(UpdateRecipeRequest $request, Recipe $recipe)
+    /**
+     * @param UpdateRecipeRequest $request
+     * @param Recipe $recipe
+     * @return RecipeResource
+     */
+    public function update(UpdateRecipeRequest $request, Recipe $recipe): RecipeResource
     {
         $validated = $request->validated();
         $recipe->update($validated);
         return new RecipeResource($recipe);
     }
 
-    public function destroy(Request $request, Recipe $recipe)
+    /**
+     * @param Recipe $recipe
+     * @return Response
+     */
+    public function destroy(Recipe $recipe): Response
     {
         $recipe->delete();
-        return response()->noContent();
+        return new RecipeResource($recipe);
     }
 }
