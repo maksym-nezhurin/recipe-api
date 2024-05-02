@@ -40,6 +40,7 @@ class RecipeController extends Controller
     {
         $validated = $request->validated();
 
+        // Log errors
         Log::info(Auth::user());
         $recipe = Auth::user()->recipes()->create($validated);
 //       $recipe = Recipe::create($validated);
@@ -65,6 +66,6 @@ class RecipeController extends Controller
     public function destroy(Recipe $recipe): Response
     {
         $recipe->delete();
-        return new RecipeResource($recipe);
+        return response()->noContent();
     }
 }
