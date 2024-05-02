@@ -33,8 +33,8 @@ class Recipe extends Model
 //        });
 //    }
 
-//    public function ingredients()
-//    {
-//        return $this->hasMany(Ingredient::class);
-//    }
+    public function ingredients(): hasMany
+    {
+        return $this->hasMany(Ingredient::class, 'recipe_id');
+    }
 }

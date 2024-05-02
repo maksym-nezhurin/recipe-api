@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+//use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -29,4 +31,23 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
+
+    public function register(Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|max:255|email|unique:users,email',
+            'password' => 'required|confirmed|min:6',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+
+        $user = User::create($validated);
+
+        return response()->json([
+            'data' => $user,
+            'access_token' => $user->createToken('api_token')->plainTextToken,
+            'token_type' => 'Bearer',
+        ],201);
+    }
+
 }
