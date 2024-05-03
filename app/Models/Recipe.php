@@ -26,15 +26,9 @@ class Recipe extends Model
         return $this->belongsTo(User::class,'creator_id');
     }
 
-//    protected static function booted(): void
-//    {
-//        static::addGlobalScope('creator', function (Builder $builder) {
-//            $builder->where('creator_id', Auth::id());
-//        });
-//    }
-
-    public function ingredients(): hasMany
+    // Working for getting ingredient for the recipe, but if I added // : BelongsToMany stop working
+    public function ingredients()
     {
-        return $this->hasMany(Ingredient::class, 'recipe_id');
+        return $this->belongsToMany(Ingredient::class, 'recipe_ingredient');
     }
 }

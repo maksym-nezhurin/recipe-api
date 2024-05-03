@@ -20,12 +20,6 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        User::create([
-            'name' => 'John Doe',
-            'password' => '$2y$12$S3FdtNmI5YsEiwnhjnJLN.T6RMsxmLi8jb4m.E6pBgO6sNnNFstA.',
-            'email' => 'doe@gmail.com',
-        ]);
-
 
         \App\Models\Recipe::factory(10)->create();
     }

@@ -26,6 +26,7 @@ class StoreRecipeRequest extends FormRequest
             'description' => 'required|max:255',
             'image' => 'required|max:255',
             'prep_time' => 'required|numeric',
+            'ids' => 'required|array',
         ];
     }
 }

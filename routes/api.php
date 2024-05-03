@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -28,4 +29,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Just for logged users
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('recipes', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 });

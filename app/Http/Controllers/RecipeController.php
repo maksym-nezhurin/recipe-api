@@ -6,7 +6,6 @@ use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Requests\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +28,9 @@ class RecipeController extends Controller
      */
     public function show(Recipe $recipe): RecipeResource
     {
+        // allowing to get list of ingredients for each recipe
+        $recipe->load('ingredients');
+
         return new RecipeResource($recipe);
     }
 
@@ -40,10 +42,13 @@ class RecipeController extends Controller
     {
         $validated = $request->validated();
 
-        // Log errors
-        Log::info(Auth::user());
+        // What about this line? Is it create recipe for the authenticated user only?
         $recipe = Auth::user()->recipes()->create($validated);
-//       $recipe = Recipe::create($validated);
+
+        foreach ($validated['ids'] as $ingredientId) {
+            $recipe->ingredients()->attach($ingredientId);
+        }
+
         return new RecipeResource($recipe);
     }
 
@@ -56,6 +61,11 @@ class RecipeController extends Controller
     {
         $validated = $request->validated();
         $recipe->update($validated);
+
+        foreach ($validated['ids'] as $ingredientId) {
+            $recipe->ingredients()->attach($ingredientId);
+        }
+
         return new RecipeResource($recipe);
     }
 
