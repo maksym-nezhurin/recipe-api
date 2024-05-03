@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Recipe::class, 'recipe');
+    }
     /**
      * @return AnonymousResourceCollection
      */
