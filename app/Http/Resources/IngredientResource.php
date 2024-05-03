@@ -20,8 +20,8 @@ class IngredientResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             "name"      =>  $this->name,
-            "category"  =>  $this->category,
-//            "category"=>CategoryResource::collection($this->category),
+            "category"  =>  $this->category->name,
+            "recipes"    => RecipeResource::collection($this->whenLoaded('recipes')),
             "calories"  =>  $this->calories,
         ];
     }

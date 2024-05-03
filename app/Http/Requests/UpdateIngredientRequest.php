@@ -23,7 +23,7 @@ class UpdateIngredientRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|max:255',
-            "category" => 'sometimes|max:255',
+//            "category" => 'sometimes|max:255',
             "calories" => 'sometimes|numeric',
         ];
     }

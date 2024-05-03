@@ -10,7 +10,7 @@ class Ingredient extends Model
 {
     use HasFactory;
 //    public $table = 'ingredients';
-    protected $fillable = ['name', 'category', 'calories'];
+    protected $fillable = ['name', 'calories', 'category_id', 'creator_id'];
 
     public function creator(): BelongsTo
     {
@@ -18,6 +18,11 @@ class Ingredient extends Model
     }
     public function recipes()
     {
-        return $this->belongsToMany(Recipe::class, 'recipe_ingredient');
+        return $this->belongsToMany(Recipe::class, 'recipe_ingredients');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 }

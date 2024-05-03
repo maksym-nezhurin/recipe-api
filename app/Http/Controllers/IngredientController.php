@@ -27,6 +27,8 @@ class IngredientController extends Controller
      */
     public function show(Ingredient $ingredient): IngredientResource
     {
+        $ingredient->load('recipes');
+
         return new IngredientResource($ingredient);
     }
 

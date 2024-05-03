@@ -5,6 +5,8 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,7 +22,14 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
+//        \App\Models\Category::create([
+//            'name' => 'Test User',
+//            'email' => 'test@example.com',
+//        ]);
 
-        \App\Models\Recipe::factory(10)->create();
+        $this->call(UserSeeder::class);
+        $this->call(CategorySeeder::class);
+        $this->call(IngredientSeeder::class);
+        $this->call(RecipeSeeder::class);
     }
 }
