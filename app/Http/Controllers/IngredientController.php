@@ -8,7 +8,6 @@ use App\Models\Ingredient;
 use App\Http\Resources\IngredientResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class IngredientController extends Controller

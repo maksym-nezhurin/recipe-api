@@ -22,6 +22,11 @@ class RecipeController extends Controller
 //        return RecipeResource::collection(Recipe::where(['creator_id'=>auth()->user()->id])->paginate(10));
     }
 
+    public function myRecipes(): AnonymousResourceCollection
+    {
+        return RecipeResource::collection(Recipe::where(['creator_id'=>auth()->user()->id])->paginate(10));
+    }
+
     /**
      * @param Recipe $recipe
      * @return RecipeResource

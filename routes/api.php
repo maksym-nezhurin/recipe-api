@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Just for logged users
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/my-recipes', [RecipeController::class, 'myRecipes']);
     Route::apiResource('recipes', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 });
