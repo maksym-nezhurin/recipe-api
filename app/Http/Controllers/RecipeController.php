@@ -9,7 +9,8 @@ use App\Models\Recipe;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use App\Models\RecipeIngredient;
+use Illuminate\Http\Request;
 
 class RecipeController extends Controller
 {
@@ -37,6 +38,37 @@ class RecipeController extends Controller
         $recipe->load('ingredients');
 
         return new RecipeResource($recipe);
+    }
+
+    public function getRecipesByIngredientsAtLeastOne(Request $request): AnonymousResourceCollection
+    {
+        $ingredientIds = explode(', ', $request->input('ingredients', ''));
+        $ingredientIds = json_decode($ingredientIds[0]);
+
+        $recipeIds = RecipeIngredient::whereIn('ingredient_id', $ingredientIds)
+            ->pluck('recipe_id')
+            ->toArray();
+
+        $recipes = Recipe::whereIn('id', $recipeIds)->get();
+
+        return RecipeResource::collection($recipes);
+    }
+
+    public function getRecipesByIngredients(Request $request): AnonymousResourceCollection
+    {
+        $ingredientIds = explode(', ', $request->input('ingredients', ''));
+        $ingredientIds = json_decode($ingredientIds[0]);
+
+        $recipeIds = RecipeIngredient::select('recipe_id')
+            ->whereIn('ingredient_id', $ingredientIds)
+            ->groupBy('recipe_id')
+            ->havingRaw('COUNT(DISTINCT ingredient_id) = ?', [count($ingredientIds)])
+            ->pluck('recipe_id')
+            ->toArray();
+
+        $recipes = Recipe::whereIn('id', $recipeIds)->get();
+
+        return RecipeResource::collection($recipes);
     }
 
     /**
