@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Requests\UpdateRecipeRequest;
+use App\Models\RecipeIngredient;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +15,11 @@ use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Recipe::class, 'recipe');
+    }
     /**
      * @return AnonymousResourceCollection
      */
@@ -25,6 +32,37 @@ class RecipeController extends Controller
     public function myRecipes(): AnonymousResourceCollection
     {
         return RecipeResource::collection(Recipe::where(['creator_id'=>auth()->user()->id])->paginate(10));
+    }
+
+    public function getRecipesByIngredientsAtLeastOne(Request $request): AnonymousResourceCollection
+    {
+        $ingredientIds = explode(', ', $request->input('ingredients', ''));
+        $ingredientIds = json_decode($ingredientIds[0]);
+
+        $recipeIds = RecipeIngredient::whereIn('ingredient_id', $ingredientIds)
+            ->pluck('recipe_id')
+            ->toArray();
+
+        $recipes = Recipe::whereIn('id', $recipeIds)->get();
+
+        return RecipeResource::collection($recipes);
+    }
+
+    public function getRecipesByIngredients(Request $request): AnonymousResourceCollection
+    {
+        $ingredientIds = explode(', ', $request->input('ingredients', ''));
+        $ingredientIds = json_decode($ingredientIds[0]);
+
+        $recipeIds = RecipeIngredient::select('recipe_id')
+            ->whereIn('ingredient_id', $ingredientIds)
+            ->groupBy('recipe_id')
+            ->havingRaw('COUNT(DISTINCT ingredient_id) = ?', [count($ingredientIds)])
+            ->pluck('recipe_id')
+            ->toArray();
+
+        $recipes = Recipe::whereIn('id', $recipeIds)->get();
+
+        return RecipeResource::collection($recipes);
     }
 
     /**
