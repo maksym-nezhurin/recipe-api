@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 
 class Recipe extends Model
@@ -30,5 +31,10 @@ class Recipe extends Model
     public function ingredients()
     {
         return $this->belongsToMany(Ingredient::class, 'recipe_ingredients');
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

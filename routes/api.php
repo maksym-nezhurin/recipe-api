@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecipeController;
@@ -33,4 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recipes-by-at-least-one-ingredients', [RecipeController::class, 'getRecipesByIngredientsAtLeastOne']);
     Route::apiResource('recipes', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+//    Route::apiResource('recipes.ingredients', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::apiResource('recipes.comments', CommentController::class)->only(['index', 'store']);
+    Route::apiResource('ingredients.comments', CommentController::class)->only(['index', 'store']);
 });
