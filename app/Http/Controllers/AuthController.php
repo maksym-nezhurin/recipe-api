@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AuthResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -37,6 +39,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /*
+     * Register a new user
+     */
     public function register(Request $request) {
         $validated = $request->validate([
             'name' => 'required|max:255',
@@ -48,11 +53,22 @@ class AuthController extends Controller
 
         $user = User::create($validated);
 
-        return response()->json([
-            'data' => $user,
-            'access_token' => $user->createToken('api_token')->plainTextToken,
-            'token_type' => 'Bearer',
-        ],201);
+        return (new AuthResource($user))->response();
+
+//        return response()->json([
+//            'data' => $user,
+//            'access_token' => $user->createToken('api_token')->plainTextToken,
+//            'token_type' => 'Bearer',
+//        ],201);
     }
 
+    public function logout(Request $request)
+    {
+        $user = auth()->user();;
+        $request->user()->tokens()->delete();
+        return (new AuthResource($user))->response();
+//        return (new AuthResource(['status' => "success"]))->response();
+
+//        return response()->json('Successfully logged out');
+    }
 }
