@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RecipeIngredient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
@@ -19,6 +20,7 @@ class RecipeController extends Controller
      */
     public function index() : AnonymousResourceCollection
     {
+        Log::info('User requested recipes' );
         return RecipeResource::collection(Recipe::paginate(10));
     }
 
