@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\AuthResource;
+use App\Mail\VerificationCodeMail;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -52,6 +55,14 @@ class AuthController extends Controller
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
+
+        $code = random_int(100000, 999999); // Generate a random verification code
+
+        // Send the email with the user and code
+        Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+        $user->verification_code = $code;
+//        $user->verification_code_expires_at = Carbon::now()->addMinutes(10); // expires in 10 minutes
+        $user->save();
 
         return (new AuthResource($user))->response();
 
