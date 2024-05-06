@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class Recipe extends Model
 {
@@ -30,6 +31,7 @@ class Recipe extends Model
     // Working for getting ingredient for the recipe, but if I added // : BelongsToMany stop working
     public function ingredients()
     {
+        Log::info('Recipe ingredients', ['recipe_id' => $this->id]);
         return $this->belongsToMany(Ingredient::class, 'recipe_ingredients');
     }
 

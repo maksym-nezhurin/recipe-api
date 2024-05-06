@@ -17,5 +17,11 @@ class UserSeeder extends Seeder
             'password' => '$2y$12$S3FdtNmI5YsEiwnhjnJLN.T6RMsxmLi8jb4m.E6pBgO6sNnNFstA.',
             'email' => 'doe@gmail.com',
         ]);
+
+        User::create([
+            'name' => 'John Second',
+            'password' => '$2y$12$S3FdtNmI5YsEiwnhjnJLN.T6RMsxmLi8jb4m.E6pBgO6sNnNFstA.',
+            'email' => 'secondjoe@gmail.com',
+        ]);
     }
 }
