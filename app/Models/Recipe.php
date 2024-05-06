@@ -31,7 +31,6 @@ class Recipe extends Model
     // Working for getting ingredient for the recipe, but if I added // : BelongsToMany stop working
     public function ingredients()
     {
-        Log::info('Recipe ingredients', ['recipe_id' => $this->id]);
         return $this->belongsToMany(Ingredient::class, 'recipe_ingredients');
     }
 
