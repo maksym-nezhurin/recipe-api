@@ -35,6 +35,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
+        // prevent doing it and send a message first, confirm and just then Auth::login($user);, because it starts the session
         Auth::login($user);
 
         return response()->noContent();
