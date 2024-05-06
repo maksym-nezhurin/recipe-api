@@ -61,7 +61,7 @@ class AuthController extends Controller
         // Send the email with the user and code
         Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
         $user->verification_code = $code;
-//        $user->verification_code_expires_at = Carbon::now()->addMinutes(10); // expires in 10 minutes
+        $user->expiration_code_time = Carbon::now()->addMinutes(10); // expires in 10 minutes
         $user->save();
 
         return (new AuthResource($user))->response();
