@@ -119,16 +119,24 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if ($user->verification_code === $validated['code'] && $user->expiration_code_time > Carbon::now()) {
+        if ($user->verification_code === $validated['code']) {
+            if ($user->expiration_code_time > Carbon::now()) {
+                return response()->json([
+                    'message' => 'Verification code expired',
+                    'verified' => false
+                ], 401);
+            }
             $user->email_verified_at = Carbon::now();
             $user->save();
             return response()->json([
                 'message' => 'Email verified',
+                'verified' => true
             ], 200);
         }
 
         return response()->json([
             'message' => 'Invalid verification code',
+            'verified' => false
         ], 401);
     }
 
