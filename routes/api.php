@@ -21,7 +21,9 @@ use App\Http\Controllers\AuthController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
+// get all or one recipe for all users
+Route::apiResource('recipes', RecipeController::class)->only(['index', 'show']);
+Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -34,8 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-recipes', [RecipeController::class, 'myRecipes']);
     Route::get('/recipes-by-ingredients', [RecipeController::class, 'getRecipesByIngredients']);
     Route::get('/recipes-by-at-least-one-ingredients', [RecipeController::class, 'getRecipesByIngredientsAtLeastOne']);
-    Route::apiResource('recipes', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
-    Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    // create, update, delete recipe just for new user
+    Route::apiResource('recipes', RecipeController::class)->only(['store', 'update', 'destroy']);
+    Route::apiResource('ingredients', IngredientController::class)->only(['store', 'update', 'destroy']);
 //    Route::apiResource('recipes.ingredients', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::apiResource('recipes.comments', CommentController::class)->only(['index', 'store']);
     Route::apiResource('ingredients.comments', CommentController::class)->only(['index', 'store']);

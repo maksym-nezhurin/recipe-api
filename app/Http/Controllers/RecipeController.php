@@ -112,6 +112,6 @@ class RecipeController extends Controller
     public function destroy(Recipe $recipe): Response
     {
         $recipe->delete();
-        return response()->noContent();
+        return response()->noContent(); // don't need any response
     }
 }
