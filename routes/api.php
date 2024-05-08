@@ -20,6 +20,8 @@ use App\Http\Controllers\AuthController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/verify', [AuthController::class, 'verify']);
+Route::post('/update-password', [AuthController::class, 'updatePassword']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 // get all or one recipe for all users
 Route::apiResource('recipes', RecipeController::class)->only(['index', 'show']);
