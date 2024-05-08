@@ -27,6 +27,19 @@ class RecipeController extends Controller
         return RecipeResource::collection(Recipe::where(['creator_id'=>auth()->user()->id])->paginate(10));
     }
 
+    public function likedRecipes(Request $request): AnonymousResourceCollection
+    {
+        $userId = $request->user()->id;
+
+        $recipes = Recipe::whereHas('likes', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        return RecipeResource::collection($recipes);
+
+//        return RecipeResource::collection(getLikedReceipts($userId));
+    }
+
     /**
      * @param Recipe $recipe
      * @return RecipeResource

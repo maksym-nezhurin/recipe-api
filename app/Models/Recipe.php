@@ -34,6 +34,11 @@ class Recipe extends Model
         return $this->belongsToMany(Ingredient::class, 'recipe_ingredients');
     }
 
+    public function likes()
+    {
+        return $this->hasMany(RecipeLike::class);
+    }
+
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');

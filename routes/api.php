@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\RecipeLikeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecipeController;
@@ -28,13 +29,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // describe routes for all and for one recipe
+Route::apiResource('recipes', RecipeController::class)->only(['index', 'show']);
 
 // Just for logged users
 Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('/like', RecipeLikeController::class)->only(['index', 'store', 'destroy']);
     Route::get('/my-recipes', [RecipeController::class, 'myRecipes']);
+    Route::get('/liked-recipes', [RecipeController::class, 'likedRecipes']);
     Route::get('/recipes-by-ingredients', [RecipeController::class, 'getRecipesByIngredients']);
     Route::get('/recipes-by-at-least-one-ingredients', [RecipeController::class, 'getRecipesByIngredientsAtLeastOne']);
-    Route::apiResource('recipes', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+    Route::apiResource('recipes', RecipeController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('ingredients', IngredientController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 //    Route::apiResource('recipes.ingredients', RecipeController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::apiResource('recipes.comments', CommentController::class)->only(['index', 'store']);
