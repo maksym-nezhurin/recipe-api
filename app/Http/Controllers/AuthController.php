@@ -2,9 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginAuthRequest;
+use App\Http\Requests\RegisterAuthRequest;
+use App\Http\Requests\VerifyAuthRequest;
 use App\Http\Resources\AuthResource;
+use App\Http\Resources\CodeUnverifiedResource;
+use App\Http\Resources\CodeVerifiedResource;
+use App\Http\Resources\EmailNotVerifiedResource;
+use App\Http\Resources\LoginAuthResource;
+use App\Http\Resources\LoginInvalidResource;
+use App\Http\Resources\RegisterAuthResource;
+use App\Http\Resources\UpdatePasswordResource;
 use App\Mail\VerificationCodeMail;
 use App\Models\User;
+// use Carbon\Carbon;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,75 +26,64 @@ use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
-    private function sendVerificationCode(User $user):void
+    /**
+     * Send a verification email to the user
+     * @param User $user
+     * $return void
+     */
+    public function sendVerificationMail(User $user)
     {
+        Log::info('Sending verification email to ' . $user->email);
         $code = random_int(100000, 999999); // Generate a random verification code
 
-        // Send the email with the user and code
         Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
         $user->verification_code = $code;
         $user->expiration_code_time = Carbon::now()->addMinutes(10); // expires in 10 minutes
         $user->save();
     }
 
-    public function login(Request $request)
+    /**
+     * @param LoginAuthRequest $request
+     * @return LoginAuthResource|\Illuminate\Http\JsonResponse
+     */
+    public function login(LoginAuthRequest $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $validated = $request->validated();
 
-        if (! Auth::attempt($validated)) {
-            return response()->json([
-                'message' => 'Login information invalid',
-            ], 401);
+        if (!Auth::attempt($validated)) {
+            return (new LoginInvalidResource(null))->response()->setStatusCode(401);
         }
 
         $user = User::where('email', $validated['email'])->first();
-        $email_verified_at = $user->email_verified_at;
 
-        if ($email_verified_at === null) {
-            $this->sendVerificationCode($user);
-            return response()->json([
-                'message' => 'Email not verified, check your email for verification code',
-            ], 401);
+        if(!$user->email_verified_at) {
+            $this->sendVerificationMail($user);
+
+            return (new EmailNotVerifiedResource(null))->response()->setStatusCode(401);
         }
 
-        return response()->json([
-            'message' => 'Login successful',
-            'success' => true,
-            'user'=> [
-                'id' => $user->id,
-                'name' => $user->name,
-                'avatar' => $user->avatar,
-            ],
-            'access_token' => $user->createToken('api_token')->plainTextToken,
-        ]);
+        return new LoginAuthResource($user);
     }
 
-    /*
-     * Register a new user
+    /**
+     * @param RegisterAuthRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request) {
-        $validated = $request->validate([
-            'name' => 'required|max:255',
-            'email' => 'required|max:255|email|unique:users,email',
-            'password' => 'required|confirmed|min:6',
-        ]);
+    public function register(RegisterAuthRequest $request) {
+        $validated = $request->validated();
 
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
 
-        $this->sendVerificationCode($user);
+        $this->sendVerificationMail($user);
 
-        return (new AuthResource($user))->response();
+        return (new RegisterAuthResource($user))->response();
     }
 
     public function updatePassword(Request $request)
     {
         $user = User::where('email', $request['email'])->first();
-        Log::info('EDmail: ', [$user->password, $request->password, Hash::check('password', $user->password)]);
         $validated = $request->validate([
             'email' => 'required|email',
             'password' => [
@@ -105,17 +105,12 @@ class AuthController extends Controller
         $user->password = $validated['password'];
         $user->save();
 
-        return response()->json([
-            'message' => 'Password updated',
-        ], 200);
+        return (new UpdatePasswordResource($user))->response()->setStatusCode(200);
     }
 
-    public function verify(Request $request)
+    public function verify(VerifyAuthRequest $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'code' => 'required|numeric',
-        ]);
+        $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
 
@@ -128,22 +123,20 @@ class AuthController extends Controller
             }
             $user->email_verified_at = Carbon::now();
             $user->save();
-            return response()->json([
-                'message' => 'Email verified',
-                'verified' => true
-            ], 200);
+            return (new CodeVerifiedResource($user))->response()->setStatusCode(200);
         }
 
-        return response()->json([
-            'message' => 'Invalid verification code',
-            'verified' => false
-        ], 401);
+        return (new CodeUnverifiedResource($user))->response()->setStatusCode(401);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
         $user = auth()->user();;
         $request->user()->tokens()->delete();
-        return (new AuthResource($user))->response();
+        return (new AuthResource($user))->response()->setStatusCode(200);
     }
 }
