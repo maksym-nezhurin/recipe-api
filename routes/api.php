@@ -37,9 +37,10 @@ Route::apiResource('recipes', RecipeController::class)->only(['index', 'show']);
 
 // Just for logged users
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/liked-receipts', [RecipeController::class, 'getLikedReceipts']);
+    Route::get('/liked-recipes', [RecipeController::class, 'likedRecipes']);
     Route::apiResource('/like', RecipeLikeController::class)->only(['index', 'store', 'destroy']);
     Route::get('/my-recipes', [RecipeController::class, 'myRecipes']);
-    Route::get('/liked-recipes', [RecipeController::class, 'likedRecipes']);
     Route::get('/recipes-by-ingredients', [RecipeController::class, 'getRecipesByIngredients']);
     Route::get('/recipes-by-at-least-one-ingredients', [RecipeController::class, 'getRecipesByIngredientsAtLeastOne']);
     // create, update, delete recipe just for new user
