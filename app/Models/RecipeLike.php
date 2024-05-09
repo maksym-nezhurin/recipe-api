@@ -10,6 +10,8 @@ class RecipeLike extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['user_id', 'recipe_id'];
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id');

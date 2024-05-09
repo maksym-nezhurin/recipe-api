@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -50,9 +49,9 @@ class User extends Authenticatable
         return $this->hasMany(Recipe::class, 'creator_id');
     }
 
-    public function likes(): BelongsToMany
+    public function likes()
     {
-        return $this->belongsToMany(RecipeLike::class, 'recipe_likes', 'creator_id', 'recipe_id');
+        return $this->hasMany(RecipeLike::class, 'user_id');
     }
 
     public function comments(): HasMany

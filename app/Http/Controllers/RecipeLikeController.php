@@ -17,8 +17,10 @@ class RecipeLikeController extends Controller
      */
     public function index():AnonymousResourceCollection
     {
-        //
-        return RecipeLikeResource::collection(RecipeLike::paginate(10));
+        $user = Auth::user();
+        $likes = Recipe::where('user_id', $user->id);
+        Log::info('liks', ['like' =>$likes]);
+        return RecipeLikeResource::collection($likes::paginate(10));
     }
 
     /**
@@ -34,6 +36,8 @@ class RecipeLikeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // TODO: Додатково додати перевірку на існування рецепту з цим id в таблці Recipe
+
         $user = Auth::user();
         $recipeId = $request->recipe_id;
 
@@ -47,10 +51,8 @@ class RecipeLikeController extends Controller
             return response()->json(['status' => 'unliked']);
         } else {
             // If no like exists, create one
-            $recipeLike = new RecipeLike();
-            $recipeLike->user_id = $user->id;
-            $recipeLike->recipe_id = $recipeId;
-            $recipeLike->save();
+
+            $user->likes()->create(['recipe_id' => $recipeId]);
             return response()->json(['status' => 'liked']);
         }
     }
