@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RecipeResource extends JsonResource
+class RegisterAuthResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,8 +14,13 @@ class RecipeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $data = parent::toArray($request);
-
-        return $data;
+        return [
+            'message' => 'User registered successfully',
+            'success' => true,
+            'user' => [
+                'name' => $this->name,
+                'email' => $this->email,
+            ]
+        ];
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRecipeRequest extends FormRequest
+class VerifyAuthRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,17 +22,8 @@ class UpdateRecipeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|max:255',
-            'description' => 'sometimes|max:255',
-            'image' => 'sometimes|max:255',
-            'prep_time' => 'sometimes|numeric',
-            'ids' => 'sometimes|array',
+            'email' => 'required|email',
+            'code' => 'required|numeric',
         ];
     }
-
-//     переписати назви
-//    public function attributes()
-//    {
-//
-//    }
 }
