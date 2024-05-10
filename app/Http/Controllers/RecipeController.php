@@ -39,37 +39,6 @@ class RecipeController extends Controller
         return new RecipeResource($recipe);
     }
 
-    public function getRecipesByIngredientsAtLeastOne(Request $request): AnonymousResourceCollection
-    {
-        $ingredientIds = explode(', ', $request->input('ingredients', ''));
-        $ingredientIds = json_decode($ingredientIds[0]);
-
-        $recipeIds = RecipeIngredient::whereIn('ingredient_id', $ingredientIds)
-            ->pluck('recipe_id')
-            ->toArray();
-
-        $recipes = Recipe::whereIn('id', $recipeIds)->get();
-
-        return RecipeResource::collection($recipes);
-    }
-
-    public function getRecipesByIngredients(Request $request): AnonymousResourceCollection
-    {
-        $ingredientIds = explode(', ', $request->input('ingredients', ''));
-        $ingredientIds = json_decode($ingredientIds[0]);
-
-        $recipeIds = RecipeIngredient::select('recipe_id')
-            ->whereIn('ingredient_id', $ingredientIds)
-            ->groupBy('recipe_id')
-            ->havingRaw('COUNT(DISTINCT ingredient_id) = ?', [count($ingredientIds)])
-            ->pluck('recipe_id')
-            ->toArray();
-
-        $recipes = Recipe::whereIn('id', $recipeIds)->get();
-
-        return RecipeResource::collection($recipes);
-    }
-
     /**
      * @param StoreRecipeRequest $request
      * @return RecipeResource
@@ -114,4 +83,68 @@ class RecipeController extends Controller
         $recipe->delete();
         return response()->noContent(); // don't need any response
     }
+
+    /**
+     * @param Request $request
+     * @return AnonymousResourceCollection
+     */
+    public function getRecipesByIngredientsAtLeastOne(Request $request): AnonymousResourceCollection
+    {
+        $ingredientIds = explode(', ', $request->input('ingredients', ''));
+        $ingredientIds = json_decode($ingredientIds[0]);
+
+        $recipeIds = RecipeIngredient::whereIn('ingredient_id', $ingredientIds)
+            ->pluck('recipe_id')
+            ->toArray();
+
+        $recipes = Recipe::whereIn('id', $recipeIds)->get();
+
+        return RecipeResource::collection($recipes);
+    }
+
+    public function getRecipesByIngredients(Request $request): AnonymousResourceCollection
+    {
+        $ingredientIds = explode(', ', $request->input('ingredients', ''));
+        $ingredientIds = json_decode($ingredientIds[0]);
+
+        $recipeIds = RecipeIngredient::select('recipe_id')
+            ->whereIn('ingredient_id', $ingredientIds)
+            ->groupBy('recipe_id')
+            ->havingRaw('COUNT(DISTINCT ingredient_id) = ?', [count($ingredientIds)])
+            ->pluck('recipe_id')
+            ->toArray();
+
+        $recipes = Recipe::whereIn('id', $recipeIds)->get();
+
+        return RecipeResource::collection($recipes);
+    }
+
+    /**
+     * @param Request $request
+     * @return AnonymousResourceCollection
+     */
+    public function likedRecipes(Request $request): AnonymousResourceCollection
+    {
+        $userId = $request->user()->id;
+
+        $recipes = Recipe::whereHas('likes', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->with('ingredients')->get();
+
+        return RecipeResource::collection($recipes);
+    }
+
+    /**
+     * @param Recipe $recipe
+     * @return RecipeResource::collection
+     */
+    // Better variant, but do the same as previous
+    public function getLikedReceipts()
+    {
+        $user = Auth::user();
+        $recipes = $user->likedRecipes()->with('ingredients')->get();
+
+        return RecipeResource::collection($recipes);
+    }
+
 }

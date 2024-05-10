@@ -49,13 +49,18 @@ class User extends Authenticatable
         return $this->hasMany(Recipe::class, 'creator_id');
     }
 
+    public function likedRecipes()
+    {
+        return $this->belongsToMany(Recipe::class, 'recipe_likes');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(RecipeLike::class, 'user_id');
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class, 'creator_id');
     }
-
-//    public function ingredients(): HasMany
-//    {
-//        return $this->hasMany(Recipe::class, 'creator_id');
-//    }
 }

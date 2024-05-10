@@ -14,9 +14,9 @@ class Comment extends Model
 
     protected $fillable = ['content'];
     public function user():BelongsTo
-{
-    return $this->belongsTo(User::class,'user_id');
-}
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 
     public function commentable(): MorphTo
     {
