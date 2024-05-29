@@ -14,7 +14,20 @@ class RecipeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $data = parent::toArray($request);
+        $data = [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'image' => $this->image,
+            'prep_time' => $this->prep_time,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'ingredients' => $this->ingredients->map(fn($ingredient) => $ingredient->only('id', 'name', 'calories', 'category_id')),
+            'likes' => [
+                'users' => $this->likes->load('user')->map(fn($like) => $like->user->only('id', 'name')),
+                'amount' => $this->likes->count(),
+            ]
+        ];
 
         return $data;
     }

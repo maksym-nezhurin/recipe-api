@@ -17,6 +17,7 @@ use App\Mail\VerificationCodeMail;
 use App\Models\User;
 // use Carbon\Carbon;
 use Carbon\Carbon;
+use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -33,10 +34,12 @@ class AuthController extends Controller
      */
     public function sendVerificationMail(User $user)
     {
-        Log::info('Sending verification email to ' . $user->email);
         $code = random_int(100000, 999999); // Generate a random verification code
-
-        Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+        try {
+            Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+        } catch (Error $error) {
+            Log::error('Error sending verification email: ' . $error->getMessage());
+        }
         $user->verification_code = $code;
         $user->expiration_code_time = Carbon::now()->addMinutes(10); // expires in 10 minutes
         $user->save();
